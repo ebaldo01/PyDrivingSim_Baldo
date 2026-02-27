@@ -103,7 +103,7 @@ def add_intersection(
         v_min: float,
         v_max: float,
         offset: float = 2.0,
-        bg_img: str = "imgs/cross2.png",
+        bg_img: str = "imgs/intersection.png",
         bg_scale: float = 5.7,
         bg_y: float = 8.1,
         n_per_direction: int = 4,   # Number of crossing vehicles for lane
