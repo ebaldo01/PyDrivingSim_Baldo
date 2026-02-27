@@ -117,15 +117,17 @@ class Agent():
             s.LatOffsLineL = - road_width/2 - v.state[1]
 
         # Objects parameters (traffic light and obstacles)
-        trafficlight = 0
-        trafficlightDist = 0
+        trafficlight = None
+        trafficlightDist = float("inf")
         speedlimitId = 0
+        speedlimitDist = float("-inf")
         objId = 0
         target = 0
+        crossDist = float("inf")
         for obj in World().obj_list:
             if type(obj) is TrafficLight:
                 # Get the closest trafficlight in front
-                if trafficlightDist == 0 or (obj.pos[0] - v.state[0] > -1.0 and obj.pos[0] - v.state[0] < trafficlightDist):
+                if 0 < obj.pos[0] - v.state[0] < trafficlightDist:
                     trafficlightDist = obj.pos[0] - v.state[0]
                     trafficlight = obj
 
@@ -155,6 +157,33 @@ class Agent():
                 s.AdasisSpeedLimitValues[speedlimitId] = obj.vel
                 s.AdasisSpeedLimitDist[speedlimitId] = obj.pos[0] - v.state[0]
                 speedlimitId = speedlimitId + 1
+                if speedlimitDist < obj.pos[0] - v.state[0] < 0:
+                    s.RequestedCruisingSpeed = obj.vel
+                    speedlimitDist = obj.pos[0] - v.state[0]
+
+            
+            if type(obj) is CrossingVehicle:
+                # find closest x with a crossing vehicle
+                if 0 < obj.pos[0] - v.state[0] < crossDist:
+                    crossDist = obj.pos[0] - v.state[0]
+
+                # consider also the following vehicles if close enough (same intersection)
+                if 0 <= fabs(obj.pos[0] - v.state[0] - crossDist) <= 10 :
+                    s.ObjID[objId] = 3
+
+                    delta_x = obj.pos[0] - v.state[0]
+                    delta_y = obj.pos[1] - v.state[1]
+
+                    s.ObjX[objId] = delta_x * cos(v.state[2]) + delta_y * sin(v.state[2])
+                    s.ObjY[objId] = -delta_x * sin(v.state[2]) + delta_y * cos(v.state[2])
+
+                    s.ObjVel[objId] = obj.vel
+                    s.ObjLen[objId] = obj.length
+                    s.ObjWidth[objId] = obj.width
+
+                    objId += 1
+
+        
 
         s.NrObjs = objId
         s.AdasisSpeedLimitNr = speedlimitId
