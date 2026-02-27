@@ -94,3 +94,43 @@ class BasicSpeedLimit():
         signal.set_pos((96, 4))
         super = GraphicObject("imgs/pictures/superstrada.png", 5)
         super.set_pos((100,6))
+
+
+
+def add_intersection(
+        # Function to spawn and populate an intersection
+        x_cross: float,
+        v_min: float,
+        v_max: float,
+        offset: float = 2.0,
+        bg_img: str = "imgs/cross2.png",
+        bg_scale: float = 5.7,
+        bg_y: float = 8.1,
+        n_per_direction: int = 4,   # Number of crossing vehicles for lane
+):
+
+    bg = GraphicObject(bg_img, bg_scale)
+    bg.set_pos((x_cross + 1, bg_y))
+
+    vehicles = []
+
+    for _ in range(n_per_direction):
+        vehicles.append(CrossingVehicle(x_cross=x_cross, v_min=v_min, v_max=v_max, direction=-1))
+    for _ in range(n_per_direction):
+        vehicles.append(CrossingVehicle(x_cross=x_cross + offset, v_min=v_min, v_max=v_max, direction=1))
+
+    return bg, vehicles
+
+
+
+
+class CrossingScenario():
+    def __init__(self):
+        v_min = 5
+        v_max = 18
+
+        #self.bg1, self.v1 = add_intersection(85.0, v_min=v_min, v_max=v_max)
+        self.bg2, self.v2 = add_intersection(140.0, v_min=v_min, v_max=v_max)
+        self.bg3, self.v3 = add_intersection(200.0, v_min=v_min, v_max=v_max)
+        self.bg4, self.v4 = add_intersection(230.0, v_min=v_min, v_max=v_max)
+
